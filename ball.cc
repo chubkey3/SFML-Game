@@ -8,18 +8,36 @@ class Ball {
     public:
 
 		Ball(int rad, int x, int y, int r, int g, int b);
-		sf::CircleShape C;	//must be public so we can draw it	
+		//sf::CircleShape C;	//must be public so we can draw it	
+        int xpos;
+        int ypos;
+        uint width;
+        uint height;
 		void move(float x, float y);
-		void update();
+		void update(int w, int h);
+        sf::Sprite sprite;
+        
+    
+    private:
+        sf::Texture texture;
+        
 	
 };
 
 int main()
 {
+    
     Ball ball(50, 100, 30, 250, 0, 0);
 
 	sf::Event event;
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "SFML Test");
+    sf::RenderWindow window(sf::VideoMode(), "SFML Window", sf::Style::Fullscreen);
+    //sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Window");
+    sf::Vector2u size = window.getSize();
+    
+    int width = size.x;
+    int height = size.y;
+    
+    std::cout << size.x << " " << size.y << std::endl;
     
     while(window.isOpen())
     {
@@ -42,9 +60,9 @@ int main()
             window.close();
         }
         
-        ball.update();
+        ball.update(width, height);
         window.clear(sf::Color::Black);
-        window.draw(ball.C);
+        window.draw(ball.sprite);
         window.display();
     }
     return 0;
@@ -54,33 +72,69 @@ int main()
 
 Ball::Ball(int rad, int x, int y, int r, int g, int b)
 {
-    
+    /*
     C.setRadius(rad);
     C.setFillColor(sf::Color(r,g,b));
     C.setPosition(x,y);
+    */
+    xpos = x;
+    ypos = y;
+    
+    
+    
+    texture.loadFromFile("ufo.png");
+    sprite.setTexture(texture);
+    
+    width = 50; //change
+    height = 50; //change
 }
 
 
 void Ball::move(float x, float y)
 {
-	C.move(x,y);
+	sprite.move(x,y);
 }
 
-void Ball::update(){
+void Ball::update(int w, int h){
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		C.move(-1,0);
+        if (xpos == 0-width){
+            xpos = w;
+            sprite.setPosition(w, ypos);
+        } else {
+            sprite.move(-1,0);
+            xpos -= 1;
+        }
+        
 	}
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		C.move(1,0);
+        if (xpos == w+width){
+            xpos = 0;
+            sprite.setPosition(0, ypos);
+        } else {
+            sprite.move(1,0);
+            xpos += 1;
+        }
 	}
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		C.move(0,1);
+        if (ypos == h+height){
+            ypos = 0;
+            sprite.setPosition(xpos, 0);
+        } else {
+            sprite.move(0,1);
+            ypos += 1;
+        }
 	}
 	if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		C.move(0,-1);
+        if (ypos == 0-width){
+            ypos = h;
+            sprite.setPosition(xpos, h);
+        } else {
+            sprite.move(0,-1);
+            ypos -= 1;
+        }
 	}
 }
